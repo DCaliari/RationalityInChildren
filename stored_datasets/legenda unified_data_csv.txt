@@ -1,0 +1,16 @@
+VARIABLES:
+group: id group
+id: id student within group
+WARP1: WARP pencils
+WARP2: WARP pens
+gender: 1 = female, 0 = male
+school: 1 = russo, 2 = trincone, 3 = fatale, 4 = marconi
+class: 1 = prima, 2 = seconda, 3 = terza, 4 = quarta, 5 = quinta
+raven: 0-8 measure
+c1,c2,c3: control questions, c3=1 is the correct one
+threes_twos: choice of lottery with 3s+2s
+threes_ones: choice of lottery with 3s+1s
+twos_ones: choice of lottery with 2s+1s
+ra: risk aversion, 0-8 measure. Only correct between 1-7.
+treatment: 1 = correlation treatment, 0 = non-correlation treatment
+ok_control: 1 if (ra>0 & ra<8 & c3=1), 0 otherwise

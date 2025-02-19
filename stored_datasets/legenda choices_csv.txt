@@ -1,0 +1,14 @@
+% 'Yellow Pencil' = 1 
+% 'Red Pencil' = 2
+% 'Orange Pencil' = 3
+% 'Blue Pencil' = 4 
+
+% 'Yellow Pen' = 5
+% 'Red Pen' = 6
+% 'Blue Pen' = 7
+% 'Green Pen' = 8
+
+% 'Laugh' = 9
+% 'Heart Eyes' = 10
+% 'Blink' = 11
+% 'Sunglasses' = 12

@@ -1,0 +1,91 @@
+group = each group of children studied, could coincide or not with the class
+id_spec = id of the child within each group
+WARP1 = violations of WARP with pencils (0-26)
+WARP2 = violations of WARP with pens (0-26)
+gender = 0 for male and 1 for female
+school = 1: "Russo", 2: "Trincone", 3: "Fatale", 4: "Marconi"
+class = grade from 1st to 5th
+raven = cognitive abilities (0-8)
+cen1_i = eigenvector centrality value for the ith pencil
+cen2_i = eigenvector centrality value for the ith pen
+c1 = Pachinko 1st wave, control question n.1
+c2 = Pachinko 1st wave, control question n.2
+c3 = Pachinko 1st wave, control question n.3 (the correct one)
+threes_twos = 1 if in the Pachinko 1st wave, the child chose the lottery with 3s and 2s, 0 otherwise, NaN if the Pachinko was not completed
+threes_ones = 1 if in the Pachinko 1st wave, the child chose the lottery with 3s and 1s, 0 otherwise, NaN if the Pachinko was not completed
+twos_ones = 1 if in the Pachinko 1st wave, the child chose the lottery with 2s and 1s, 0 otherwise, NaN if the Pachinko was not completed
+ra = risk aversion in the 1st wave (0-8), the rational ones are 1-7
+esito = results of the Pachinko 1st wave (1-8), it is 0 if the "esito" was not recorded
+treatment = 0 if the child chose the independent lotteries, 1 if the child chose the correlated lotteries (only 1st wave)
+ind1_2w = Pachinko 2nd wave, control question n.1 (in this case, equivalent to the independent lotteries)
+ind2_2w = Pachinko 2nd wave, control question n.2 (in this case, equivalent to the independent lotteries)
+ind3_2w = Pachinko 2nd wave, control question n.3 (in this case, equivalent to the independent lotteries), the correct one
+corr1_2w = Pachinko 2nd wave, the two highly overlapped lotteries (correlation neglect) - 4 and 5 1s
+corr2_2w = Pachinko 2nd wave, the not overlapped lotteries but dominated (irrational) - 4 and 2 1s
+corr3_2w = Pachinko 2nd wave, the not overlapped lotteries (rational) - 5 and 2 1s
+ra_2w = risk aversion in the 2nd wave (0-8), the rational ones are 1-7
+Yellow, Red, Orange, Blue Pencil = 1,2,3,4 to map the colors of the pencils to a number
+Vote Yellow, Red, Orange, Blue Pencil = child's vote for the Yellow, Red, Orange, Blue Pencil (1-5)
+Yellow, Red, Blue, Green Pen = 5,6,7,8 to map the colors of the pens to a number
+Vote Yellow, Red, Blue, Green Pen = child's vote for the Yellow, Red, Orange, Blue Pen (1-5)
+min_slider_pencils, max_slider_pencils = min,max of the votes for pencils
+cv_slider_pencils = coefficient of variation of the votes for pencils
+range_slider_pencils = range of the votes for pencils 
+min_slider_pens, max_slider_pencils = min,max of the votes for pens
+cv_slider_pens = coefficient of variation of the votes for pens
+range_slider_pens = range of the votes for pens 
+age_child = age of the child in days
+age_mother = age of the mother in days
+age_father = age of the father in days
+school_mother = completed level of education of the mother
+school_father = completed level of education of the father
+x0012, x0013, etc... = toy chosen in each set "x0012 stands for Yellow and Red pencils"
+win = Pachinko 1st wave, = 0 if the child lost, = 1 if the child won, = 99 if we don't know the result
+winM  = Pachinko 1st wave, = 0 if the child lost, = 1,2,3 if the child won 1,2,3 toys, = 99 if we don't know the result
+s1 = 1 if school="Russo", 0 otherwise
+s2 = 1 if school="Trincone", 0 otherwise
+s3 = 1 if school="Fatale", 0 otherwise
+s4 = 1 if school="Marconi", 0 otherwise
+SN_mother = 1 if school_mother == "Nessun titolo di studio"
+S1_mother = 1 if school_mother == "Scuola secondaria di 1Âº grado (Licenza media)"
+S2_mother = 1 if school_mother =="Scuola secondaria di 2Âº grado (diploma di istruzione liceale, diploma di istruzione tecnica, diploma di istruzione professionale)"
+SP_mother = 1 if school_mother == "Scuola primaria (Licenza elementare)"
+SLS_mother = 1 if school_mother == "Laurea specialistica" | school_mother == "Laurea Specialistica"
+SLT_mother = 1 if school_mother == "Laurea triennale"
+SD_mother = 1 if school_mother == "Dottorato di ricerca"
+missing_S = school_mother == ""
+SN_father = 1 if school_father == "Nessun titolo di studio"
+S1_father = 1 if school_father == "Scuola secondaria di 1Âº grado (Licenza media)"
+S2_father = 1 if school_father =="Scuola secondaria di 2Âº grado (diploma di istruzione liceale, diploma di istruzione tecnica, diploma di istruzione professionale)"
+SP_father = 1 if school_father == "Scuola primaria (Licenza elementare)"
+SLS_father = 1 if school_father == "Laurea specialistica" | school_father == "Laurea Specialistica"
+SLT_father = 1 if school_father == "Laurea triennale"
+SD_father = 1 if school_father == "Dottorato di ricerca"
+SD_parents = 1 if SD_mother ==1 | SD_father == 1
+SLS_parents = 1 if (SLS_mother == 1 | SLS_father == 1) & SD_parents==0
+SLT_parents = 1 if (SLT_mother == 1 | SLT_father == 1) & (SD_parents==0 & SLS_parents == 0)
+S2_parents = 1 if (S2_mother == 1 | S2_father == 1) & (SD_parents==0 & SLS_parents == 0 & SLT_parents == 0)
+S1_parents = 1 if (S1_mother == 1 | S1_father == 1) & (SD_parents==0 & SLS_parents == 0 & SLT_parents == 0 & S2_parents == 0)
+SP_parents = 1 if (SP_mother == 1 | SP_father == 1) & (SD_parents==0 & SLS_parents == 0 & SLT_parents == 0 & S2_parents == 0 & SP_parents == 0)
+SN_parents = 1 if SN_mother == 1 & SN_father == 1
+SP_below_parents = 1 if SP_parents == 1 | SN_parents == 1
+SL_above = 1 if SLT_parents == 1 | SLS_parents == 1 | SD_parents == 1
+
+---------------------------- STRUCTURAL ESTIMATES ---------------------------- 
+
+est_rho_unique = individual estimate of "rho" for the model in ECMA (2020) where rho is the same between alternatives
+est_rho_3x3_bin, est_rho_3x3_ter, est_rho_3x3_quat = individual estimate of "rho" for the model in ECMA (2020) where rho changes by cardinality of the menus
+att_sal = individual estimate of "rho" for the model in ECMA (2020) where rho changes for each alternative
+H_nosalience1, H_nosalience4 = estimates for the model "gamma" in ECMA (2020). The first refers to the probability to be type 1, namely consider only one alternative,
+				The second refers to the probability to be type 4, namely consider all four alternatives.
+H_salience1, Hsalience4 = estimates for the model "gamma" in ECMA (2020). The first refers to the probability to be type 1, namely consider only one alternative,
+				The second refers to the probability to be type 4, namely consider all four alternatives. Here, there is a level of salience that changes for each
+				alternative.
+H_saliencerand_1, H_saliencerand_4, H_saliencerand_5 = estimates for the model "gamma" in ECMA (2020). The first refers to the probability to be type 1, namely consider only one alternative,
+				The second refers to the probability to be type 4, namely consider all four alternatives. The last refers to the probability to be type 5, namely
+				to be a uniform randomizers. Here, there is a level of salience that changes for each alternative plus a fifth type that simply randomize uniformly.
+
+
+
+
+
