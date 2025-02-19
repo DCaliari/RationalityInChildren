@@ -1,0 +1,74 @@
+{% extends 'template.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row">
+	<div class="col-md-12 text-center">
+		<h1 class="display-3">{{ page_title }}</h1>
+		<br><br>
+		<!-- all data sent to views.py slider and use method post to not save in url -->
+	</div>
+</div>
+<div class="container">
+	{% for image in images %}
+		<div class="row">
+			<div class="col-sm-3">
+				<img src="{% static '' %}images/{{ cartella_img }}/{{ image }}" class="slider_image float-left">
+			</div>
+			<div class="col-sm-8">
+				{% for em in emoji %}
+					&emsp;
+					<img id="{{ image }}_{{ forloop.counter }}" src="{% static '' %}images/emoji/{{ em }}" class="emoji_image"
+					onclick="return on_click_image(this.id, '{{ image }}', {{ forloop.counter }});"/>
+					&emsp;
+				{% endfor %}
+				<br><br>
+			</div>
+		</div>
+		<hr>
+	{% endfor %}
+</div>
+<!-- add one parameter html that is hidden and pass the data store_slider = true to python -->
+
+<!-- csrf is a series of pseudo-casual numbers to avoid that sharing a link may be "used to get money illegally."
+It is a security number.-->
+{% csrf_token %}
+<!-- this button sends the data to views.py -->
+<br><br>
+<div class="col-md-12">
+	<div class="text-center">
+		<button id="button_submit" class="btn btn-lg btn-primary" onclick="return on_click_submit()" disabled>Avanti</button>
+	</div>
+</div>
+
+<script>
+	var selected_images = {};
+	
+	function on_click_image(id, image, mark){
+		// if there was already a selected image then get the image from function _ and remove border
+		if(selected_images[image]!==null){
+			var image_prec = _(image+'_'+selected_images[image]);
+			if(image_prec!=null){
+				image_prec.classList.remove('selected_image');
+			}
+		}
+		//new image
+		selected_images[image] = mark;
+		var button = _('button_submit');
+		if(Object.keys(selected_images).length==4){
+			button.disabled = false;
+		}
+		var selected_image = _(id);
+		// add border to the new selected image
+		selected_image.classList.add('selected_image');
+	}
+	// The last three lines remove the disabled class from the button when the button is clicked.
+	
+	// da "selected_image=id" ottengo l'id dell'immagine selezionata e poi lo passo con "+ selected_image" below
+	function on_click_submit(){
+		_('button_submit').disabled = true;
+		location.href="slider_save2?" + "&marks=" + JSON.stringify(selected_images);
+	}
+
+</script>
+{% endblock %}

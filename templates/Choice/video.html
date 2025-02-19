@@ -1,0 +1,28 @@
+{% extends 'template.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row">
+	<div class="col-md-12">
+		<div class="embed-responsive embed-responsive-16by9">
+			<video controls autoplay muted playsinline onended="return go_to_next_page()">
+				<source src="{{ video }}" type="video/mp4">
+			</video>
+		</div>
+	</div>
+</div>
+<!--
+<div class="row">
+	<div class="col-md-12">
+		<div class="text-right">
+			<a href="{{ next_url_page }}" class="btn btn-lg btn-primary">Avanti</a>
+		</div>
+	</div>
+</div>
+-->
+<script>
+	function go_to_next_page() {
+		location.href="{{ next_url_page }}";
+	}
+</script>
+{% endblock %}

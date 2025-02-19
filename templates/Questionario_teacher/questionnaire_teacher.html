@@ -1,0 +1,91 @@
+{% extends 'template.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row">
+	<div class="col-md-12">
+		<h1>{{ page_title }}</h1>
+	</div>
+</div>
+
+<form action="questionnaire_teacher_save?num_page={{ num_page }}" method="post">
+	<div class="row">
+		<div class="col-md-6">
+			<div class="form-group">
+				<label for="nome">Nome:</label>
+				<input type="text" id="nome" name="nome" class="form-control" value="{{ formBean.nome.value }}" placeholder="Nome"/>
+				{% if formBean.nome.errors %}<div class="alert alert-danger">{{ formBean.nome.errors }}</div>{% endif %}
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-6">
+			<div class="form-group">
+				<label for="cognome">Cognome:</label>
+				<input type="text" id="cognome" name="cognome" class="form-control" value="{{ formBean.cognome.value }}" placeholder="Cognome"/>
+				{% if formBean.cognome.errors %}<div class="alert alert-danger">{{ formBean.cognome.errors }}</div>{% endif %}
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-6">
+			<div class="form-group">
+				<label for="classe_alunno">Classe dell'alunno:</label>
+				<input type="text" id="classe_alunno" name="classe_alunno" class="form-control" value="{{ formBean.classe_alunno.value }}" placeholder="Classe"/>
+				{% if formBean.classe_alunno.errors %}<div class="alert alert-danger">{{ formBean.classe_alunno.errors }}</div>{% endif %}
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-3">
+			<div class="form-group">
+				<label for="data_nascita">Data di Nascita:</label>
+				<input type="date" id="data_nascita" name="data_nascita" class="form-control" value="{{ formBean.data_nascita.value }}" placeholder="Data di Nascita"/>
+				{% if formBean.data_nascita.errors %}<div class="alert alert-danger">{{ formBean.data_nascita.errors }}</div>{% endif %}
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12 text-center">
+			<h4><b>Tratti della personalità</b></h4>
+		</div>
+	<div class="row">
+		<div class="col-xs-3 col-sm-3 col-md-3"></div>
+		<div class="col-sm-6">
+			<div class="form-group">
+				<table border="0" class="tabella_questionario">
+					{% for x, y in frasi %}
+					<tr>
+						<td>
+							<h4>{{ x }}</h4>
+						</td>
+						<td>&nbsp;&nbsp;</td>
+						{% for numero in intensity %}
+						<td>
+							<label for="trait_{{ forloop.parentloop.counter0 }}">{{ numero }}</label>
+							<input type="radio" id="trait_{{ forloop.parentloop.counter0 }}" name="trait{{ forloop.parentloop.counter0 }}" value="{{ numero }}" />
+						</td>
+						<td>&nbsp;&nbsp;</td>
+						{% endfor %}
+						<td>
+							<h4>{{ y }}</h4>
+						</td>
+					</tr>
+					{% endfor %}
+				</table>
+				{% if has_errors %}<div class="alert alert-danger">Devi compilare tutti i campi del questionario</div>{% endif %}
+			</div>
+		</div>
+		<div class="col-sm-3"></div>
+	</div>
+	
+	<!-- csrf e' un codice di sicurezza per evitare che la richiesta venga effettuata senza volerlo -->
+	{% csrf_token %}
+	<br><br>
+	<div class="row">
+		<div class="col-sm-12 text-center">
+			<button class="btn btn-lg btn-primary" type="submit">Salva</button>
+		</div>
+	</div>
+</form>
+{% endblock %}
