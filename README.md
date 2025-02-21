@@ -23,4 +23,4 @@ To replicate the figures and tables generated with Matlab, after adding the dire
 
 To replicate the tables generated with Stata, after adding the directory as "working directory", simply run the "Replication.do" file in the "Stata code" directory.
 
-Finally, we have generated 1000 (resp. 10000) bootstrapped estimates for calculating the standard errors in the estimates of the consideration parameter in the pencils/pens task (resp. coin-drop game). These estimates are stored in the folder stored_variables within the folder figures_tables, and they are loaded on the script to ensure that the resulting figures are equivalent to those on the paper.
+Finally, we have generated 1000 (resp. 10000) bootstrapped estimates for calculating the standard errors in the estimates of the consideration parameter in the pencils/pens task (resp. coin-drop game). These estimates are stored in the folder stored_variables within the folder figures_tables, and they are loaded on the script to ensure that the resulting figures are equivalent to those on the paper. In the files, we have kept the code we used to produce the bootstrap estimates if the reader is interested.
