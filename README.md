@@ -15,7 +15,7 @@ The replication software and supporting data are organised in the following dire
 
 The replication files:
 (i) in the Matlab Code folder, the file FullReplicationCode.m reproduces all figures and tables, and store them.
-    More specifically, the file reproduces Figures 4-11, 21-23, 25, 27-36; and Tables 2-8.
+    More specifically, the file reproduces Figures 4-11, 22-24, 26, 28-36; and Tables 2-8.
 (ii) in the Stata Code folder, the file Replication.do reproduces all regression tables and some descriptive statistics.
     More specifically, the file reproduces Tables 1, 9-17, 20-29.
 
