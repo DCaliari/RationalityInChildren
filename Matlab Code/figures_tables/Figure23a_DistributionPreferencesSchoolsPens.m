@@ -19,18 +19,18 @@ load gender_class_school.mat
 spring = group < 8; 
 
 %% Create subpopulations based on school and class
-T(:,1) = gender & class == 1 & ~spring & (school ==1 | school == 4);
-T(:,2) = gender & class == 2 & ~spring & (school ==1 | school == 4);
-T(:,3) = gender & class == 3 & ~spring & (school ==1 | school == 4);
-T(:,4) = gender & class == 4 & ~spring & (school ==1 | school == 4);
-T(:,5) = gender & class == 5 & ~spring & (school ==1 | school == 4);
-T(:,6) = ~gender & class == 1 & ~spring & (school ==1 | school == 4);
-T(:,7) = ~gender & class == 2 & ~spring & (school ==1 | school == 4);
-T(:,8) = ~gender & class == 3 & ~spring & (school ==1 | school == 4);
-T(:,9) = ~gender & class == 4 & ~spring & (school ==1 | school == 4);
-T(:,10) = ~gender & class == 5 & ~spring & (school ==1 | school == 4);
-T(:,11) = gender & ~spring & (school ==1 | school == 4);
-T(:,12) = ~gender & ~spring & (school ==1 | school == 4);
+T(:, 1) = school == 1 & class == 1 & ~spring;
+T(:, 2) = school == 1 & class == 2 & ~spring;
+T(:, 3) = school == 1 & class == 3 & ~spring;
+T(:, 4) = school == 1 & class == 4 & ~spring;
+T(:, 5) = school == 1 & class == 5 & ~spring;
+T(:, 6) = school == 4 & class == 1 & ~spring;
+T(:, 7) = school == 4 & class == 2 & ~spring;
+T(:, 8) = school == 4 & class == 3 & ~spring;
+T(:, 9) = school == 4 & class == 4 & ~spring;
+T(:, 10) = school == 4 & class == 5 & ~spring;
+T(:, 11) = school == 1 & ~spring;
+T(:, 12) = school == 4 & ~spring;
 
 %% Begin the estimation process
 for treatment = 1:2
@@ -167,16 +167,17 @@ cat2 = reordercats(cat2, {'YRBG','YRGB','YBRG','YBGR','YGRB','YGBR','RYBG','RYGB
 
 % Define positions for x-axis ticks
 x = [1 2 3 4 5];
-x1 = x - 0.1;
-x2 = x + 0.1; 
+x1 = x - 0.1; % Adjusted x for School L
+x2 = x + 0.1; % Adjusted x for School H
 
-b1 = bar(cat2, preferences{1}(11:12, :)); % Bar plot for first treatment
-ylim([0 0.3]); % Set y-axis limits
-legend('Female', 'Male'); % Add legend
+
+b2 = bar(cat2, preferences{2}(11:12, :)); % Bar plot for second treatment
 set(gca, 'FontName', 'Times'); % Set font
-b1(1).FaceColor = 'r'; % Set color for Girls
-b1(2).FaceColor = 'b'; % Set color for Boys
-
+ylim([0 0.3]); % Set y-axis limits
+legend('School L', 'School H'); % Add legend
+set(gca, 'FontName', 'Times'); % Set font
+b2(1).FaceColor = 'r'; % Set color for School L
+b2(2).FaceColor = 'b'; % Set color for School H
 
 % Set the figure to landscape orientation
 set(gcf, 'PaperOrientation', 'landscape');
@@ -191,7 +192,6 @@ set(gcf, 'PaperPosition', [0 0 20 8.5]);  % Set [left bottom width height]
 % Adjust the figure window size to match the paper size (optional)
 set(gcf, 'Units', 'inches');
 set(gcf, 'Position', [1 1 20 8.5]);  % Set [left bottom width height]
-
 
 
 

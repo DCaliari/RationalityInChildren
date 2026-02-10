@@ -1,0 +1,214 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% ECMA MODEL ESTIMATIONS %%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+create_warp_datasets
+
+[DATA1,DATA2,~,~,~,~] = dataset_constructions(DATASET(:,1:6),n); % use the function "dataset_constructions" to obtain the dataset for estimation
+
+C_pencils = DATA1; % These are the choices from the pencils
+C_pens = DATA2; % These are the choices from the pens
+
+%% Here I load data on school, groups, class, etc...
+
+load groups.mat 
+
+load gender_class_school
+
+spring = group < 8; % I focus on the pupils who did the experiment in the autumn
+
+%% I create the subpopulations
+
+
+T(:,1) = school == 1 & class == 1 & ~spring;
+T(:,2) = school == 1 & class == 2 & ~spring;
+T(:,3) = school == 1 & class == 3 & ~spring;
+T(:,4) = school == 1 & class == 4 & ~spring;
+T(:,5) = school == 1 & class == 5 & ~spring;
+T(:,6) = school == 4 & class == 1 & ~spring;
+T(:,7) = school == 4 & class == 2 & ~spring;
+T(:,8) = school == 4 & class == 3 & ~spring;
+T(:,9) = school == 4 & class == 4 & ~spring;
+T(:,10) = school == 4 & class == 5 & ~spring;
+T(:,11) = school > 1 & school < 4 & class == 1 & ~spring;
+T(:,12) = school > 1 & school < 4 & class == 2 & ~spring;
+T(:,13) = school > 1 & school < 4 & class == 3 & ~spring;
+T(:,14) = school > 1 & school < 4 & class == 4 & ~spring;
+T(:,15) = school > 1 & school < 4 & class == 5 & ~spring;
+T(:,16) = school == 1 & ~spring;
+T(:,17) = school == 4 & ~spring;
+T(:,18) = school > 1 & school < 4 & ~spring;
+
+%% Here the estimation's loop starts
+
+for treatment = 1:2
+    if treatment==1 % Focus on pencils
+        C = C_pencils;
+    elseif treatment==2 % Focus on pens
+        C = C_pens;
+    end
+
+
+iter=1;
+
+for z=1:18 % Here we go through the subpopulations
+
+clearvars N p_par_new pi_par_new F y % eliminate the previous parameters
+
+g = 1; % Number of gamma parameters = 1, i.e. unique consideration parameter
+
+N=size(C(T(:,z),:),1); % Numerosity of the subpopulation
+
+% p_par = rand(g,1); % starting point for the estimation of the gamma parameter
+% p_par = sort(p_par);
+p_par = 0.5;
+
+%%%% This is to check that the starting point does not modify the estimates
+if iter==1
+pi_par=ones(1,(g)*lc)/((g)*lc); % starting point for the estimation of the probability distribution "pi" - uniform
+else
+pi_par = rand(1,(g)*lc); % starting point for the estimation of the probability distribution "pi" - random vector
+pi_par = pi_par./sum(pi_par);
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+pi_par_old = pi_par;
+
+tol_par = 1e-9;
+par_dist=1; it=1; 
+
+p_par_old = p_par;
+
+options=optimoptions('fmincon','display','off','MaxFunctionEvaluations',1e7,...
+    'StepTolerance',1e-9,'FunctionTolerance',1e-9,'OptimalityTolerance',1e-9,'FiniteDifferenceType','central' );
+
+LL_dist = 1; 
+tol_LL = 1e-8; % Log-likelihood differences for the while loop
+
+while   LL_dist>tol_LL
+clearvars Q P % I clear the conditional probabilities matrices to recalculate them with the new estimated parameters
+Q=[];
+p_par = p_par_old;
+
+temp_par = repmat(p_par,1,4); % Here, unique gamma per each alternative
+
+%%% Here, we calculate the conditional probabilities matrices
+
+for i=1:size(p_par,1)
+for u=1:lc
+P(:,u) = P_Rho_varying_type(temp_par(i,:),PER,u,R); 
+end
+
+temp=P;
+Q=[Q,temp];
+
+end
+
+%%%
+
+
+F=exp(C(T(:,z),:)*log(Q)); % This is the likelihood function
+
+
+%%% The constraints in the first maximization problem
+
+lb = zeros(size(F,2),1); % lower bound at zero for the probabilities
+ub = ones(size(F,2),1); % upper bound at one for the probabilities
+Aeq = ones(1,size(F,2)); % the vector of probabilities sum to one
+beq = 1;
+
+%%%
+
+[pi_par_new] = fmincon(@(pi_par) Log_lik_EB(pi_par,F), pi_par_old',[],[],Aeq,beq,lb,ub,[],options); % maximization of the likelihood w.r.t. to the probability distribution
+pi_par_new = pi_par_new';
+
+%%% The constraints in the second maximization problem: lower/upper bound
+%%% for gamma at 0 and 1
+
+lb=0;
+for i=1:size(p_par_old,1)-1    
+    lb = [lb;p_par_old(i)];
+end
+ub=[];
+for i=1:size(p_par_old,1)-1 
+ub  = [ub;p_par_old(1+i)];
+end
+ub=[ub;1];
+
+%%%
+
+[p_par_new,~,~,~,~,grad,hessian] = fmincon(@(p_par) log_lik_model(p_par, pi_par_new, PER, lc, R, C(T(:,z),:)), p_par_old, [], [], [], [], lb, ub, [], options); % maximization of the likelihood w.r.t. to gamma
+
+LL_dist = log_lik_model(p_par_old, pi_par_new, PER, lc, R, C(T(:,z),:)) - log_lik_model(p_par_new, pi_par_new, PER, lc, R, C(T(:,z),:)); % likelihood distance
+
+pi_par_old = pi_par_new; % re-set the parameters in the while loop
+p_par_old=p_par_new;
+it=it+1;
+end
+
+parameters{treatment}(:,z) = p_par_new; % store the estimated gammas
+preferences{treatment}(z,:) = pi_par_new; % store the estimated probability distribution
+
+RHO{treatment}(z,1) = sum(reshape(preferences{treatment}(z,:),24,g))*parameters{treatment}(:,z); % store the average gamma if there are more than one
+
+end
+end
+
+%% PLOTS TYPE DISTRIBUTION BY SCHOOLS
+
+% Define categorical labels for the types
+cat1 = categorical({'DLFS','DLSF','DFLS','DFSL','DSLF','DSFL','LDFS','LDSF','LFDS','LFSD','LSDF',...
+    'LSFD','FDLS','FDSL','FLDS','FLSD','FSDL','FSLD','SDLF','SDFL','SLDF','SLFD','SFDL','SFLD'});
+
+% Reorder the categories for plotting
+cat1 = reordercats(cat1, {'DLFS','DLSF','DFLS','DFSL','DSLF','DSFL','LDFS','LDSF','LFDS','LFSD','LSDF',...
+    'LSFD','FDLS','FDSL','FLDS','FLSD','FSDL','FSLD','SDLF','SDFL','SLDF','SLFD','SFDL','SFLD'});
+
+% Define categorical labels for the second set of types
+cat2 = categorical({'YRBG','YRGB','YBRG','YBGR','YGRB','YGBR','RYBG','RYGB','RBYG','RBGY','RGYB',...
+    'RGBY','BYRG','BYGR','BRYG','BRGY','BGYR','BGRY','GYRB','GYBR','GRYB','GRBY','GBYR','GBRY'});
+
+% Reorder the categories for the second plotting
+cat2 = reordercats(cat2, {'YRBG','YRGB','YBRG','YBGR','YGRB','YGBR','RYBG','RYGB','RBYG','RBGY','RGYB',...
+    'RGBY','BYRG','BYGR','BRYG','BRGY','BGYR','BGRY','GYRB','GYBR','GRYB','GRBY','GBYR','GBRY'});
+
+% Define positions for x-axis ticks
+x = [1 2 3 4 5];
+x1 = x - 0.1; % Adjusted x for School L
+x2 = x + 0.1; % Adjusted x for School H
+
+% Create the first subplot for School L and School H (first dataset)
+subplot(1, 2, 1)
+b1 = bar(cat1, preferences{1}(16:18, :)); % Bar plot for first treatment
+ylim([0 0.3]); % Set y-axis limits
+legend('School L', 'School H', 'Schools M'); % Add legend
+set(gca, 'FontName', 'Times'); % Set font
+b1(1).FaceColor = 'r'; % Set color for School L
+b1(2).FaceColor = 'b'; % Set color for School H
+
+% Create the second subplot for School L and School H (second dataset)
+subplot(1, 2, 2)
+b2 = bar(cat2, preferences{2}(16:18, :)); % Bar plot for second treatment
+set(gca, 'FontName', 'Times'); % Set font
+ylim([0 0.3]); % Set y-axis limits
+legend('School L', 'School H', 'Schools M'); % Add legend
+set(gca, 'FontName', 'Times'); % Set font
+b2(1).FaceColor = 'r'; % Set color for School L
+b2(2).FaceColor = 'b'; % Set color for School H
+
+% Set the figure to landscape orientation
+set(gcf, 'PaperOrientation', 'landscape');
+
+% Set the figure size (width and height in inches)
+set(gcf, 'PaperUnits', 'inches');
+set(gcf, 'PaperSize', [20 8.5]);  % Set width and height of the paper
+
+% Adjust the position and size of the plot to fill the entire page
+set(gcf, 'PaperPosition', [0 0 20 8.5]);  % Set [left bottom width height]
+
+% Adjust the figure window size to match the paper size (optional)
+set(gcf, 'Units', 'inches');
+set(gcf, 'Position', [1 1 20 8.5]);  % Set [left bottom width height]
+
+
+

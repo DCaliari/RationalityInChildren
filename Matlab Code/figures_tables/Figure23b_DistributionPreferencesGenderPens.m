@@ -170,7 +170,7 @@ x = [1 2 3 4 5];
 x1 = x - 0.1;
 x2 = x + 0.1; 
 
-b1 = bar(cat2, preferences{1}(11:12, :)); % Bar plot for first treatment
+b1 = bar(cat2, preferences{2}(11:12, :)); % Bar plot for first treatment
 ylim([0 0.3]); % Set y-axis limits
 legend('Female', 'Male'); % Add legend
 set(gca, 'FontName', 'Times'); % Set font

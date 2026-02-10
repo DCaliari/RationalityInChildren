@@ -20,14 +20,17 @@ spring = group < 8;
 
 %% Create subpopulations based on school and class
 
-for fig = 1:2
+for fig = 1:3
 
     if fig == 1
-T(:,1) = gender & ~spring & (school ==1 | school == 4);
-T(:,2) = ~gender & ~spring & (school ==1 | school == 4);
+T(:,1) = gender & ~spring;
+T(:,2) = ~gender & ~spring;
     elseif fig == 2
 T(:,1) = ~spring & school ==1;
-T(:,2) = ~spring & school == 4;
+T(:,2) = ~spring & school > 1 & school < 4;
+    elseif fig == 3
+T(:,1) = ~spring & school == 4;
+T(:,2) = ~spring & school > 1 & school < 4;
     end
 
 %% Begin the estimation process
@@ -69,11 +72,11 @@ for treatment = 1:2
 
     % Optimization loop for parameters
     while LL_dist > tol_LL
-        clearvars Q P 
-        Q = []; 
-        p_par = p_par_old;
+        clearvars Q P % Clear matrices for conditional probabilities
+        Q = []; % Initialize Q matrix
+        p_par = p_par_old; % Use the old gamma parameter
 
-        temp_par = repmat(p_par, 1, 4); % Replicate gamma parameter for alternatives (unique consideration parameter)
+        temp_par = repmat(p_par, 1, 4); % Replicate gamma parameter for alternatives
 
         % Calculate conditional probabilities matrices
         for i = 1:size(p_par, 1)
@@ -81,7 +84,7 @@ for treatment = 1:2
                 P(:, u) = P_Rho_varying_type(temp_par(i, :), PER, u, R); 
             end
             temp = P;
-            Q = [Q, temp];
+            Q = [Q, temp]; % Concatenate calculated Q values
         end
 
         % Calculate the likelihood function
@@ -123,7 +126,6 @@ for treatment = 1:2
     preferences{treatment}(1, :) = pi_par_new; 
 end % End of subpopulation loop
 
-% Store the resulting likelihoods for pencils and pens
 LLu_pencils = -log_lik_model_pooled(parameters{1}(:, 1), preferences{1}(1, :), PER, lc, R, C_pencils(T(:, 1), :), C_pencils(T(:, 2), :));
 
 LLu_pens = -log_lik_model_pooled(parameters{2}(:, 1), preferences{2}(1, :), PER, lc, R, C_pens(T(:, 1), :), C_pens(T(:, 2), :));
@@ -170,11 +172,11 @@ for treatment = 1:2
 
     % Optimization loop for parameters
     while LL_dist > tol_LL
-        clearvars Q P 
-        Q = []; 
-        p_par = p_par_old;
+        clearvars Q P % Clear matrices for conditional probabilities
+        Q = []; % Initialize Q matrix
+        p_par = p_par_old; % Use the old gamma parameter
 
-        temp_par = repmat(p_par, 1, 4); % Replicate gamma parameter for alternatives (unique consideration parameter)
+        temp_par = repmat(p_par, 1, 4); % Replicate gamma parameter for alternatives
 
         % Calculate conditional probabilities matrices
         for i = 1:size(p_par, 1)
@@ -231,107 +233,90 @@ for treatment = 1:2
     preferences{treatment}(1, :) = pi_par_new; 
 end % End of subpopulation loop
 
-
-% Below we show the likelihood-ratio test, notice that
-% The likelihood-ratio test cannot be used in this case due to the nature
-% of the maximization problem which is constrained. 
-% In fact, the p-values are incredibly small which is a standard
-% observation for LLT in these problems
-
-
 LLc_pencils = -log_lik_model_pooled(parameters{1}(:, 1), preferences{1}(1, :), PER, lc, R, C_pencils(T(:, 1), :), C_pencils(T(:, 2), :));
 
 LLc_pens = -log_lik_model_pooled(parameters{2}(:, 1), preferences{2}(1, :), PER, lc, R, C_pens(T(:, 1), :), C_pens(T(:, 2), :));
 
 
-[h,pvalue] = lratiotest(LLu_pencils,LLc_pencils,23)
-[h,pvalue] = lratiotest(LLu_pens,LLc_pens,23)
 
 
-% We, therefore, use a Chi-square test for which we simulate the
-% distribution of the test under the null to correct for small sample
-% biases
-
-
-%% Distribution of the chi-square test under the null
+%% I want to create a distribution of the chi-square test under the null
 
 NschoolL = sum(T(:,1));
 NschoolH = sum(T(:,2));
 
 clearvars tsim sL sH test
 
-B=10000; % set number of bootstrap iterations
+B=10000;
+
 
 for b=1:B
         tsim(b,:) = zeros(1,3);
-    while tsim(b,2) == 0 || tsim(b,2) == 1 
-sL(b,:) = randsample(1:24, NschoolL, true, preferences{1}(1,1:24));  % sample schools for group L with replacement using estimated constrained preference distribution
-sH(b,:) = randsample(1:24, NschoolH, true, preferences{1}(1,25:48)); % sample schools for group H with replacement using estimated constrained preference distribution
-[tsim(b,1), tsim(b,2)] = chi2test2(sL(b,:), sH(b,:)); % compute chi-squared statistic and p-value for sampled data
-tsim(b,3) = chi2inv(tsim(b,2),23); % compute inverse chi-squared cdf value with 23 degrees of freedom (statistic)
+    while tsim(b,2) == 0 || tsim(b,2) == 1
+sL(b,:) = randsample(1:24, NschoolL, true, preferences{1}(1,1:24));
+sH(b,:) = randsample(1:24, NschoolH, true, preferences{1}(1,25:48));
+[tsim(b,1), tsim(b,2)] = chi2test2(sL(b,:), sH(b,:));
+tsim(b,3) = chi2inv(tsim(b,2),23);
     end
 end
 tsim_pencils = tsim;
 for b=1:B
         tsim(b,:) = zeros(1,3);
-    while tsim(b,2) == 0 || tsim(b,2) == 1 
-sL(b,:) = randsample(1:24, NschoolL, true, preferences{2}(1,1:24)); % sample schools for group L with replacement using estimated constrained preference distribution
-sH(b,:) = randsample(1:24, NschoolH, true, preferences{2}(1,25:48)); % sample schools for group H with replacement using estimated constrained preference distribution
-[tsim(b,1), tsim(b,2)] = chi2test2(sL(b,:), sH(b,:)); % compute chi-squared statistic and p-value for sampled data
-tsim(b,3) = chi2inv(tsim(b,2),23); % compute inverse chi-squared cdf value with 23 degrees of freedom (statistic)
-    end 
+    while tsim(b,2) == 0 || tsim(b,2) == 1
+sL(b,:) = randsample(1:24, NschoolL, true, preferences{2}(1,1:24));
+sH(b,:) = randsample(1:24, NschoolH, true, preferences{2}(1,25:48));
+[tsim(b,1), tsim(b,2)] = chi2test2(sL(b,:), sH(b,:));
+tsim(b,3) = chi2inv(tsim(b,2),23);
+    end
 end
 tsim_pens = tsim;
 
+% ecdf(tsim_pens(:,3))
+% hold on 
+% plot(0:1:140,chi2cdf(0:1:140,23))
+% hold off
+
+% statistical tests, comparison between distributions
 
 
-% pencils: I simulate 10000 samples and for each I compute the chi2
+
+% pencils: I bootstrap 1000 samples and for each I compute the chi2
 % statistic. Then I average the resulting chi2 statistic to compute the
 % p-value
-% This is the chi-square from our observed sample. This is a quick
-% methodology to obtain it, one could also look at the euclidean distance
-% between the distributions
 
 for t=1:10000
     test(t,:) = zeros(1,3);
     while test(t,2) == 0 || test(t,2) == 1
-sampleL = randsample(1:24, NschoolL, true, prefu_pencils(1,1:24)); % sample schools for group L with replacement using estimated unconstrained preference distribution
-sampleH = randsample(1:24, NschoolH, true, prefu_pencils(1,25:48)); % sample schools for group H with replacement using estimated unconstrained preference distribution
+sampleL = randsample(1:24, NschoolL, true, prefu_pencils(1,1:24));
+sampleH = randsample(1:24, NschoolH, true, prefu_pencils(1,25:48));
 
 [test(t,1), test(t,2)] = chi2test2(sampleL, sampleH);
 test(t,3) = chi2inv(test(t,2),23);
     end
 end
 
-chiPencils = chi2cdf(mean(test(:,3)),23); % This is the chi-square from our observed sample.
+chiPencils = chi2cdf(mean(test(:,3)),23);
 
-chistatPencils(fig) = mean(test(:,3)); % This is the chi-square from our observed sample.
+chistatPencils(fig) = mean(test(:,3));
 
-% pens: I simulate 10000 samples and for each I compute the chi2
+% pens: I bootstrap 1000 samples and for each I compute the chi2
 % statistic. Then I average the resulting chi2 statistic to compute the
 % p-value
-% This is the chi-square from our observed sample. This is a quick
-% methodology to obtain it, one could also look at the euclidean distance
-% between the distributions
 
 for t=1:10000
     test(t,:) = zeros(1,3);
     while test(t,2) == 0 || test(t,2) == 1
-sampleL = randsample(1:24, NschoolL, true, prefu_pens(1,1:24)); % sample schools for group L with replacement using estimated unconstrained preference distribution
-sampleH = randsample(1:24, NschoolH, true, prefu_pens(1,25:48)); % sample schools for group H with replacement using estimated unconstrained preference distribution
+sampleL = randsample(1:24, NschoolL, true, prefu_pens(1,1:24));
+sampleH = randsample(1:24, NschoolH, true, prefu_pens(1,25:48));
 
 [test(t,1), test(t,2)] = chi2test2(sampleL, sampleH);
 test(t,3) = chi2inv(test(t,2),23);
     end
 end
 
-chiPens = chi2cdf(mean(test(:,3)),23); % This is the chi-square from our observed sample.
+chiPens = chi2cdf(mean(test(:,3)),23);
 
-chistatPens(fig) = mean(test(:,3)); % This is the chi-square from our observed sample.
-
-
-% Here I used the bootstraped distribution of the test statistic to obtain
-% the p-value controlling from small sample
+chistatPens(fig) = mean(test(:,3));
 
 chiCDF = sort(tsim_pencils(:,3));
 [~,temp_pvalue_pencils] =min(abs(chiCDF-chistatPencils(fig)));
@@ -343,8 +328,8 @@ pvalue_pens(fig) = temp_pvalue_pens/B
 
 end
 
-section_4_3_chisquare_pencils = array2table(pvalue_pencils' , ...
-    "RowNames", {'Pencils - between genders', 'Pencils - between schools'}, "VariableNames",{'Chi2 - pvalue'})
+section_B1OA_chisquare_gender = array2table([pvalue_pencils(1);pvalue_pens(1)] , ...
+    "RowNames", {'Pencils - between genders', 'Pens - between genders'}, "VariableNames",{'Chi2 - pvalue'})
 
-section_A1OA_chisquare_pens = array2table(pvalue_pens' , ...
-    "RowNames", {'Pens - between genders', 'Pens - between schools'}, "VariableNames",{'Chi2 - pvalue'})
+section_B1OA_chisquare_schools = array2table([pvalue_pencils(2:3)';pvalue_pens(2:3)'], ...
+    "RowNames", {'Pencils - School L vs Schools M', 'Pencils - School H vs Schools M','Pens - School L vs Schools M','Pens - School H vs Schools M'}, "VariableNames",{'Chi2 - pvalue'})
