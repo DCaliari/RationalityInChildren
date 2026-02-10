@@ -293,11 +293,55 @@ replace spring = 1 if group<8
 gen rhoapprox = (rho14_pencilsfinal + rho14_pensfinal)/2
 
 
+***********************************************************************************************************
+********* TRENDS - TABLE 15 ***************************************************************************************
+**************************************************************************************************
+
+reg rhoind_pencils  c.class##i.schoolMR if (s1==1 | s4==1) & ~spring, cluster(group)
+outreg2 using c.xls, replace ctitle(Pencils)
+reg rhoind_pens  c.class##i.schoolMR if (s1==1 | s4==1) & ~spring, cluster(group)
+outreg2 using c.xls, append ctitle(Pens)
+reg raven_norm c.class##i.schoolMR  if (s1==1 | s4==1) & ~spring, cluster(group)
+outreg2 using c.xls, append ctitle(Raven)
+mlogit IND c.class##i.schoolMR if (s1==1 | s4==1) & class>2  & fail_corr==0, cluster(group) b(1)  noomit
+outreg2 using c.xls, append ctitle(Correlated Task)
+estat ic
+mlogit CORR c.class##i.schoolMR if (s1==1 | s4==1) & class>2  & fail_corr==0, cluster(group) b(1)  noomit
+outreg2 using c.xls, append ctitle(Correlated Task)
+estat ic
+
+
+reg rhoind_pencils  c.class##i.schoolMR if (s1==1 | s4==1) & parents_edu !=. & ~spring, cluster(group)
+outreg2 using c.xls, replace ctitle(Pencils)
+reg rhoind_pens  c.class##i.schoolMR if (s1==1 | s4==1) & parents_edu !=. & ~spring, cluster(group)
+outreg2 using c.xls, append ctitle(Pens)
+reg raven_norm c.class##i.schoolMR  if (s1==1 | s4==1) & parents_edu !=. & ~spring, cluster(group)
+outreg2 using c.xls, append ctitle(Raven)
+mlogit IND c.class##i.schoolMR if (s1==1 | s4==1) & class>2  & fail_corr==0 & parents_edu !=. , cluster(group) b(1)  noomit
+outreg2 using c.xls, append ctitle(Correlated Task)
+estat ic
+mlogit CORR c.class##i.schoolMR if (s1==1 | s4==1) & class>2  & fail_corr==0 & parents_edu !=. , cluster(group) b(1)  noomit
+outreg2 using c.xls, append ctitle(Correlated Task)
+estat ic
+
+
+reg rhoind_pencils  c.class##i.schoolHL if  parents_edu !=. & ~spring, cluster(group)
+outreg2 using c.xls, replace ctitle(Pencils)
+reg rhoind_pens  c.class##i.schoolHL if parents_edu !=. & ~spring, cluster(group)
+outreg2 using c.xls, append ctitle(Pens)
+reg raven_norm c.class##i.schoolHL  if  parents_edu !=. & ~spring, cluster(group)
+outreg2 using c.xls, append ctitle(Raven)
+mlogit IND c.class##i.schoolHL if class>2  & fail_corr==0 & parents_edu !=. , cluster(group) b(1)  noomit
+outreg2 using c.xls, append ctitle(Correlated Task)
+estat ic
+mlogit CORR c.class##i.schoolHL if class>2  & fail_corr==0 & parents_edu !=. , cluster(group) b(1)  noomit
+outreg2 using c.xls, append ctitle(Correlated Task)
+estat ic
 
 ***********************************************************************************************************
 ********* MAIN REGRESSIONS - unconditional + conditional ************** without spring ************************** normalized but not standardized *******************
 ************************** PENCILS ************************************************************************
-************************ TABLE 9 ****************************************************************
+************************ TABLE 10 ****************************************************************
 
 reg rhoind_pencils raven_norm cv_slider_pencils gender if (s1==1 | s4==1) & ~spring, cluster(group)
 outreg2 using c.xls, replace ctitle(Rho)
@@ -324,10 +368,26 @@ reg rhoind_pencils raven_norm class3_norm parents_edu cv_slider_pencils gender s
 outreg2 using c.xls, append ctitle(Rho)
 
 
+** comparing time trends
+
+reg rhoind_pencils  c.class##i.schoolMR if (s1==1 | s4==1) & ~spring, cluster(group)
+outreg2 using c.xls, replace ctitle(Rho)
+reg rhoind_pencils  c.class##i.schoolMR if (s1==1 | s4==1) & parents_edu=~. & ~spring, cluster(group)
+outreg2 using c.xls, replace ctitle(Rho)
+reg rhoind_pencils raven_norm  c.class##i.schoolMR cv_slider_pencils if (s1==1 | s4==1) & ~spring, cluster(group)
+outreg2 using c.xls, replace ctitle(Rho)
+reg rhoind_pencils raven_norm  c.class##i.schoolMR cv_slider_pencils parents_edu gender if (s1==1 | s4==1) & ~spring, cluster(group)
+outreg2 using c.xls, append ctitle(Rho)
+reg rhoind_pencils raven_norm  c.class##i.schoolH cv_slider_pencils if ~spring, cluster(group)
+outreg2 using c.xls, append ctitle(Rho)
+reg rhoind_pencils raven_norm  c.class##i.schoolH parents_edu gender cv_slider_pencils if ~spring, cluster(group)
+outreg2 using c.xls, append ctitle(Rho)
+
+
 ***********************************************************************************************************
 ********* MAIN REGRESSIONS - unconditional + conditional ************** without spring ************************** normalized but not standardized *******************
 ************************** PENS ************************************************************************
-************************ TABLE 10 ****************************************************************
+************************ TABLE 11 ****************************************************************
 
 reg rhoind_pens raven_norm cv_slider_pens gender if (s1==1 | s4==1) & ~spring, cluster(group)
 outreg2 using c.xls, replace ctitle(Rho)
@@ -351,7 +411,7 @@ outreg2 using c.xls, append ctitle(Rho)
 ***********************************************************************************************************
 ********* ALL SCHOOLS - unconditional + conditional ************** without spring ************************** normalized but not standardized *******************
 ************************** PENCILS ************************************************************************
-************************* TABLE 14 *****************************************************************
+************************* TABLE 16 *****************************************************************
 
 reg rhoind_pencils raven_norm cv_slider_pencils gender if  ~spring, cluster(group)
 outreg2 using c.xls, replace ctitle(Rho)
@@ -373,7 +433,7 @@ outreg2 using c.xls, append ctitle(Rho)
 ***********************************************************************************************************
 ********* ALL SCHOOLS - unconditional + conditional ************** without spring ************************** normalized but not standardized *******************
 ************************** PENS ************************************************************************
-*************************** TABLE 15 ******************************************************************
+*************************** TABLE 17 ******************************************************************
 
 
 reg rhoind_pens raven_norm cv_slider_pens gender if  ~spring, cluster(group)
@@ -398,7 +458,7 @@ outreg2 using c.xls, append ctitle(Rho)
 ***********************************************************************************************************
 ********* MAIN REGRESSION - unconditional + conditional ************** without spring ************************** normalized but not standardized *******************
 ************************** RAVEN ************************************************************************
-************************** TABLE 13 *****************************************************************
+************************** TABLE 14 *****************************************************************
 
 
 reg raven_norm grade2 grade3 grade4 grade5 gender if (s1==1 | s4==1) & ~spring, cluster(group)
@@ -422,9 +482,21 @@ outreg2 using c.xls, append ctitle(Raven)
 
 
 
+** comparing time trends
+
+reg raven_norm c.class##i.schoolMR  if (s1==1 | s4==1) & ~spring, cluster(group)
+outreg2 using c.xls, replace ctitle(Raven)
+reg raven_norm c.class##i.schoolMR parents_edu gender if (s1==1 | s4==1) & ~spring, cluster(group)
+outreg2 using c.xls, append ctitle(Raven)
+reg raven_norm c.class##i.schoolH if ~spring, cluster(group)
+outreg2 using c.xls, append ctitle(Raven)
+reg raven_norm c.class##i.schoolH parents_edu gender if ~spring, cluster(group)
+outreg2 using c.xls, append ctitle(Raven)
+
+
 ***********************************************************************************************************
 ********* MAIN REGRESSIONS (Logit) - unconditional + conditional ************** without spring ************************** normalized but not standardized *******************
-****************************** TABLE 12 *********************************************************
+****************************** TABLE 13 *********************************************************
 
 mlogit CORR raven_norm gender succ_mon2w if  (s1==1 |s4==1) & class>2 & fail_corr==0, cluster(group) b(1) noomit
 outreg2 using c.xls, replace ctitle(Correlation Neglect)
@@ -454,7 +526,7 @@ estat ic
 
 ***********************************************************************************************************
 ********* MAIN REGRESSIONS (Logit) - unconditional + conditional ************** without spring ************************** normalized but not standardized *******************
-************************ TABLE 11 ***************************************************************
+************************ TABLE 12 ***************************************************************
 
 mlogit IND raven_norm gender  if  (s1==1 |s4==1) & class>2 & fail_corr==0, cluster(group) b(1) noomit
 outreg2 using c.xls, replace ctitle(Independent Task)
@@ -482,9 +554,54 @@ outreg2 using c.xls, append ctitle(Independent Task)
 estat ic
 
 
+
+mlogit IND raven_norm c.class##i.schoolMR if  (s1==1 |s4==1) & class>2  & fail_corr==0, cluster(group) b(1)  noomit
+outreg2 using c.xls, replace ctitle(Independent Task)
+estat ic
+mlogit IND raven_norm c.class##i.schoolMR parents_edu gender if (s1==1 | s4==1) & class>2  & fail_corr==0, cluster(group) b(1)  noomit
+outreg2 using c.xls, append ctitle(Independent Task)
+estat ic
+mlogit IND raven_norm c.class##i.schoolHL if class>2  & fail_corr==0, cluster(group) b(1)  noomit
+outreg2 using c.xls, append ctitle(Independent Task)
+estat ic
+mlogit IND raven_norm c.class##i.schoolHL parents_edu gender if class>2  & fail_corr==0, cluster(group) b(1)  noomit
+outreg2 using c.xls, append ctitle(Independent Task)
+estat ic
+
+
+mlogit CORR raven_norm c.class##i.schoolMR if (s1==1 | s4==1) & class>2  & fail_corr==0, cluster(group) b(1)  noomit
+outreg2 using c.xls, replace ctitle(Correlated Task)
+estat ic
+mlogit CORR raven_norm c.class##i.schoolMR succ_mon2w if (s1==1 | s4==1) & class>2  & fail_corr==0, cluster(group) b(1)  noomit
+outreg2 using c.xls, append ctitle(Correlated Task)
+estat ic
+mlogit CORR raven_norm c.class##i.schoolMR succ_mon2w parents_edu gender if (s1==1 | s4==1) & class>2  & fail_corr==0, cluster(group) b(1)  noomit
+outreg2 using c.xls, append ctitle(Correlated Task)
+estat ic
+mlogit CORR raven_norm c.class##i.schoolHL if class>2  & fail_corr==0, cluster(group) b(1)  noomit
+outreg2 using c.xls, append ctitle(Correlated Task)
+estat ic
+mlogit CORR raven_norm c.class##i.schoolHL succ_mon2w if class>2  & fail_corr==0, cluster(group) b(1)  noomit
+outreg2 using c.xls, append ctitle(Correlated Task)
+estat ic
+mlogit CORR raven_norm c.class##i.schoolHL succ_mon2w parents_edu gender if class>2  & fail_corr==0, cluster(group) b(1)  noomit
+outreg2 using c.xls, append ctitle(Correlated Task)
+estat ic
+
+
+
+
+
+
+reg corr3_2w raven_norm c.class##i.schoolMR if  (s1==1 |s4==1) & class>2  & fail_corr==0, cluster(group) 
+outreg2 using c.xls, append ctitle(Independent Task)
+reg corr3_2w raven_norm c.class##i.schoolMR succ_mon2w if  (s1==1 |s4==1) & class>2  & fail_corr==0, cluster(group) 
+outreg2 using c.xls, append ctitle(Independent Task)
+reg ind3_2w raven_norm c.class##i.schoolMR if  (s1==1 |s4==1) & class>2  & fail_corr==0, cluster(group) 
+outreg2 using c.xls, append ctitle(Independent Task)
 ***********************************************************************************************************
 ********* ALL SCHOOLS (Logit) - unconditional + conditional ************** without spring ************************** normalized but not standardized *******************
-************************ TABLE 16 ***************************************************************
+************************ TABLE 18 ***************************************************************
 
 mlogit IND raven_norm gender  if  class>2 & fail_corr==0, cluster(group) b(1) noomit
 outreg2 using c.xls, replace ctitle(Independent Task)
@@ -515,7 +632,7 @@ estat ic
 
 ***********************************************************************************************************
 ********* ALL SCHOOLS (Logit) - unconditional + conditional ************** without spring ************************** normalized but not standardized *******************
-****************************** TABLE 17 *********************************************************
+****************************** TABLE 19 *********************************************************
 
 mlogit CORR raven_norm gender succ_mon2w if  class>2 & fail_corr==0, cluster(group) b(1) noomit
 outreg2 using c.xls, replace ctitle(Correlation Neglect)
@@ -552,7 +669,7 @@ estat ic
 
 ***********************************************************************************************************
 ********* MAIN REGRESSIONS - uncondtional + conditional - approx Bayes ************** without spring ************************** normalized but not standardized *******************
-************************* TABLE 20 ******************************************************************
+************************* TABLE 22 ******************************************************************
 
 reg rho14_pencilsfinal raven_norm cv_slider_pencils gender if (s1==1 | s4==1) & ~spring, cluster(group)
 outreg2 using c.xls, replace ctitle(Rho)
@@ -574,7 +691,7 @@ outreg2 using c.xls, append ctitle(Rho)
 
 ***********************************************************************************************************
 ********* MAIN REGRESSIONS - uncondtional + conditional - approx Bayes ************** without spring ************************** normalized but not standardized *******************
-************************* TABLE 21 ******************************************************************
+************************* TABLE 23 ******************************************************************
 
 reg rho14_pensfinal raven_norm cv_slider_pens gender if (s1==1 | s4==1) & ~spring, cluster(group)
 outreg2 using c.xls, replace ctitle(Rho)
@@ -600,7 +717,7 @@ outreg2 using c.xls, append ctitle(Rho)
 ***********************************************************************************************************
 ********* MAIN REGRESSIONS - uncondtional + conditional - BETA ************** without spring ************************** normalized but not standardized *******************
 ************************** PENCILS ************************************************************************
-****************** TABLE 22 ********************************************************************
+****************** TABLE 24 ********************************************************************
 
 gen RHOIND_pencils = rhoind_pencils
 replace RHOIND_pencils=0.999 if RHOIND_pencils == 1
@@ -626,7 +743,7 @@ outreg2 using c.xls, append ctitle(Rho)
 ***********************************************************************************************************
 ********* MAIN REGRESSIONS - uncondtional + conditional - BETA ************** without spring ************************** normalized but not standardized *******************
 ************************** PENS ************************************************************************
-***************** TABLE 23 *****************************************************************************
+***************** TABLE 25 *****************************************************************************
 
 gen RHOIND_pens = rhoind_pens
 replace RHOIND_pens=0.999 if RHOIND_pens == 1
@@ -653,7 +770,7 @@ outreg2 using c.xls, append ctitle(Rho)
 ***********************************************************************************************************
 ********* MAIN REGRESSIONS - uncondtional + conditional ************** including May 2022 ************************** normalized but not standardized *******************
 ************************** PENCILS ************************************************************************
-************** TABLE 24 ****************************************************************************
+************** TABLE 26 ****************************************************************************
 
 reg rhoind_pencils raven_norm cv_slider_pencils gender if (s1==1 | s4==1) & repeated2~=1, cluster(group)
 outreg2 using c.xls, replace ctitle(Rho)
@@ -677,7 +794,7 @@ outreg2 using c.xls, append ctitle(Rho)
 ***********************************************************************************************************
 ********* MAIN REGRESSIONS - uncondtional + conditional ************** without repeated ************************** normalized but not standardized *******************
 ************************** PENS ************************************************************************
-************** TABLE 25 ****************************************************************************
+************** TABLE 27 ****************************************************************************
 
 reg rhoind_pens raven_norm cv_slider_pens gender if (s1==1 | s4==1) & repeated2~=1, cluster(group)
 outreg2 using c.xls, replace ctitle(Rho)
@@ -701,7 +818,7 @@ outreg2 using c.xls, append ctitle(Rho)
 ***********************************************************************************************************
 ********* MAIN REGRESSIONS (linear - rational) - unconditional + conditional ************** ************************** normalized but not standardized *******************
 ***********************************************************************************************************
-************** TABLE 27 ****************************************************************************
+************** TABLE 29 ****************************************************************************
 
 reg corr3_2w raven_norm gender succ_mon2w if  (s1==1 |s4==1) & class>2 & fail_corr==0, cluster(group)
 outreg2 using c.xls, replace ctitle(Correlation Neglect)
@@ -732,7 +849,7 @@ outreg2 using c.xls, append ctitle(Correlation Neglect)
 ***********************************************************************************************************
 ********* MAIN REGRESSIONS (linear - rational) - unconditional + conditional ************** without spring ************************** normalized but not standardized *******************
 ***********************************************************************************************************
-************** TABLE 26 ****************************************************************************
+************** TABLE 28 ****************************************************************************
 
 reg ind3_2w raven_norm gender  if  (s1==1 |s4==1) & class>2 & fail_corr==0, cluster(group)
 outreg2 using c.xls, replace ctitle(FOSD)
@@ -764,7 +881,7 @@ outreg2 using c.xls, append ctitle(FOSD)
 ***********************************************************************************************************
 ********* MAIN REGRESSIONS (Logit) - unconditional + conditional ************** without spring ************************** normalized but not standardized *******************
 ***********************************************************************************************************
-************** TABLE 28 ****************************************************************************
+************** TABLE 30 ****************************************************************************
 
 
 mlogit CORR raven_norm gender if succ_mon2w>0 &  (s1==1 |s4==1) & class>2 & fail_corr==0, cluster(group) b(1) noomit
@@ -797,7 +914,7 @@ estat ic
 ***********************************************************************************************************
 ********* ALL SCHOOLS (Logit) - unconditional + conditional ************** without spring ************************** normalized but not standardized *******************
 ***********************************************************************************************************
-************** TABLE 29 ****************************************************************************
+************** TABLE 31 ****************************************************************************
 
 
 mlogit CORR raven_norm gender if succ_mon2w>0 &  class>2 & fail_corr==0, cluster(group) b(1) noomit
